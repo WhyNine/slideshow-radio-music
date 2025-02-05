@@ -18,21 +18,15 @@ jellyfin-apikey: "xxxxxxxxxxxxxxxxxxx"        (this can be obtained from the Jel
 
 health-check-url: "https://hc-ping.com/xxxxxxxxxxxxxxxxxxxxx"
 
-met-wow:
-  site-id: xxxxxxxxxxxxxxxxxxxxxxx
-  software-type: xxxxxxxxxxxxxxxxx
-  authentication-key: xxxxxxx
-  url: http://wow.metoffice.gov.uk/automaticreading
+mqtt:
+  server: xxxxxxxxxxxxxxxxxxxxxxx            (name or IP address)
+  username: xxxxxxxxxxxxxxxxx
+  password: xxxxxxx
 
-stations:
-  gold:
-    name: "Gold UK"
-    url: "https://media-ssl.musicradio.com/Gold"
-    icon: "gold_large.png"
-    thumbnail: "gold-small.png"
-  ghr:
-    name: "Greatest Hits"
-    url: "https://media-ssl.musicradio.com/Gold"
-    icon: "greatest-hits-radio-large.png"
-    thumbnail: "greatest-hits-radio-small.png"
+stations:                                   (repeat following lines for each station)
+  <handle>:
+    name: "xxxxx"
+    url: "https://xxxxxxxxx"
+    icon: "xxxxx.png"
+    thumbnail: "xxxxxx.png"
 ```
