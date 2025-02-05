@@ -5,7 +5,7 @@ use strict;
 
 our @EXPORT = qw ( init_fb clear_screen display_photo display_string display_albums_top display_albums_with_letter display_playing_album display_playlists_top display_playing_playlist 
   print_transport_icons display_artists_top display_artists_with_letter display_artist_albums_with_letter display_radio_top display_playing_radio print_heading print_footer display_playing_radio_details 
-  clear_play_area clear_display_area prepare_photo display_home_assistant);
+  clear_play_area clear_display_area prepare_photo display_home_assistant display_playing_nothing);
 use base qw(Exporter);
 
 use lib "/home/pi/display";
@@ -447,9 +447,11 @@ sub print_heading {
   }));
 }
 
+#----------------------------------------------------------------------------------------------------------------------
 # args: 2 lines of text of what is playing, width of gap to print into
 sub display_playing_text {
   my ($line1, $line2, $width) = @_;
+  $fb->clip_reset();
   $fb->set_color($black);
   $fb->rbox({
     'x'          => 0,
@@ -495,6 +497,22 @@ sub display_playing_text {
   }
   $tmp->{'y'} = 1154 - int((38 - $h) / 2);
   $fb->ttf_print($tmp);
+}
+
+sub display_playing_nothing {
+  my $full = shift;
+  clear_play_area($full);
+  $fb->clip_reset();
+  $fb->ttf_print($fb->ttf_print({
+    'bounding_box' => TRUE,
+    'text'      => "Nothing playing",
+    'x'         => WIDTH / 2,
+    'y'         => ($full) ? 930 : 1130,
+    'height'    => 38,
+    'center'    => CENTER_X,
+    'face'      => 'Commissioner-Regular.ttf',
+    'color'     => convert_colour_to_hex($screen_text_colour),
+  })) if $full;
 }
 
 #----------------------------------------------------------------------------------------------------------------------
@@ -1371,7 +1389,7 @@ sub display_printer {
 
 sub display_home_assistant {
   my ($data_ref, $force_display) = @_;
-  print_error("display home assistant");
+  #print_error("display home assistant");
   display_solar($data_ref, $force_display);
   display_car($data_ref, $force_display);
   display_printer($data_ref, $force_display);

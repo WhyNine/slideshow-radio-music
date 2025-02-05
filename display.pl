@@ -116,7 +116,6 @@ sub set_display_mode {
   $mode_display_area = $new;
   $playing_params[$mode_playing_area]->{"update_fn"}();
   print_heading($display_mode_headings[$mode_display_area]);
-  clear_play_area(($mode_display_area == DISPLAY_SLIDESHOW) ? 0 : 1) if $mode_playing_area == PLAYING_NOTHING;
   stop_displaying_pictures() if $mode_display_area != DISPLAY_SLIDESHOW;
   start_displaying_pictures() if $mode_display_area == DISPLAY_SLIDESHOW;
 }
@@ -131,14 +130,6 @@ sub stop_all_audio {
   `pkill vlc`;
 }
 
-sub set_swipes {
-  my ($ref, $left, $right, $up, $down) = @_;
-  $$ref{"up"}->{"cb"} = $up;
-  $$ref{"down"}->{"cb"} = $down;
-  $$ref{"left"}->{"cb"} = $left;
-  $$ref{"right"}->{"cb"} = $right;
-}
-
 sub remove_leading_article {
   my $text = shift;
   return substr($text, 4) if ($text =~ m/^The /);
@@ -147,7 +138,7 @@ sub remove_leading_article {
 }
 
 sub update_nothing_playing {
-  clear_play_area(($mode_display_area == DISPLAY_SLIDESHOW) ? 0 : 1) if $mode_playing_area == PLAYING_NOTHING;
+  display_playing_nothing(($mode_display_area == DISPLAY_SLIDESHOW) ? 0 : 1);
 }
 
 #----------------------------------------------------------------------------------------------------------------------
