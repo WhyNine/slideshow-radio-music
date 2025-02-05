@@ -1074,7 +1074,7 @@ $pids{"MQTT"} = spawn {
   };
 };
 
-$pids{"HealthCheck"} = spawn {
+$pids{"HealthCheck"} = spawn {                    # ping to healthcheck.io to say we're still running
   Event->timer(after => 10, interval => 55, cb => sub {  
     my @res = system("/bin/bash -c 'curl $health_check_url' > /dev/null 2>&1");
   });
