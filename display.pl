@@ -1091,14 +1091,16 @@ $music_event = Event->timer(after => 0, interval => 60 * 2, cb => sub {
   gather_music(); 
 });
 
-$backlight_event = Event->timer(after => 60, interval => 60 * 30, cb => sub {       # turn display off at 11pm and on at 8am
+$backlight_event = Event->timer(after => 60, interval => 60 * 10, cb => sub {       # turn display off at 11pm and on at 8am
   my $hour = (localtime())[2];
-  print_error("backlight event at $hour");
+  #print_error("backlight event at $hour");
   if ($hour == 23) {
     turn_display_off();
+    $backlight_event->interval(3600) if $backlight_event->interval < 3600;
   }
   if ($hour == 8) {
     turn_display_on();
+    $backlight_event->interval(3600) if $backlight_event->interval < 3600;
   }
 });
 

@@ -49,6 +49,13 @@ my $yellow = {
    'alpha' => 255
 };
 
+my $pale_yellow = {
+   'red'   => 240,
+   'green' => 240,
+   'blue'  => 60,
+   'alpha' => 255
+};
+
 my $black = {
    'red'   => 0,
    'green' => 0,
@@ -67,6 +74,13 @@ my $green = {
    'red'   => 0,
    'green' => 255,
    'blue'  => 0,
+   'alpha' => 255
+};
+
+my $dark_green = {
+   'red'   => 50,
+   'green' => 170,
+   'blue'  => 20,
    'alpha' => 255
 };
 
@@ -1111,7 +1125,7 @@ sub draw_slice {
   my $large = ($size eq "large");
   my $radius = ($large) ? 100 : 40;
   $fb->clip_reset();
-  $fb->set_color((defined $part) ? $green : $grey);
+  $fb->set_color((defined $part) ? $dark_green : $grey);
   $fb->draw_arc({
     'x'             => $x,
     'y'             => $y,
@@ -1121,7 +1135,7 @@ sub draw_slice {
     'granularity'   => 0.05,
     'mode'          => 1
   });
-  $fb->set_color((defined $part) ? $yellow : $grey);
+  $fb->set_color((defined $part) ? $pale_yellow : $grey);
   $fb->draw_arc({
     'x'             => $x,
     'y'             => $y,
@@ -1161,8 +1175,8 @@ sub draw_slice {
     'bounding_box' => TRUE,
     'y'            => $y + (($large) ? 47 : 35),
     'height'       => ($large) ? 30 : 20,
-    'wscale'       => 1,                            # Scales the width.  1 is normal
-    'face'         => 'Commissioner-Regular.ttf',
+    'wscale'       => 1.1,                            # Scales the width.  1 is normal
+    'face'         => 'Commissioner-SemiBold.ttf',
     'color'        => convert_colour_to_hex($screen_text_colour),
     'text'         => $title,
     'center'       => CENTER_X
