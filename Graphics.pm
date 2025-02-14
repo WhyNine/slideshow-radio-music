@@ -16,6 +16,7 @@ use MQTT;
 use Graphics::Framebuffer;
 use List::Util qw(min);
 use File::Basename;
+use Image::Resize;
 
 my $fb;
 use constant WIDTH => 720;
@@ -318,28 +319,28 @@ sub print_transport_icons {
 sub display_square_image {
   my ($image_path, $alt_image_path, $x, $y, $size, $frame_flag) = @_;
   $fb->clip_reset();
-  if (-e $image_path) {                     # print icon
-    $fb->blit_write($fb->load_image({
-    'x'          => $x,
-    'y'          => $y,
-    'width'      => $size,
-    'height'     => $size,
-    'file'       => $image_path,
-    'convertalpha' => FALSE, 
-    'preserve_transparency' => TRUE
-    }));
-  } else {
+  if (! -e $image_path) {
     print_error("Unable to load thumbnail $image_path");
-    $fb->blit_write($fb->load_image({
-    'x'          => $x,
-    'y'          => $y,
-    'width'      => $size,
-    'height'     => $size,
-    'file'       => $alt_image_path,
-    'convertalpha' => FALSE, 
-    'preserve_transparency' => TRUE
-    }));
+    $image_path = $alt_image_path;
   }
+  my $scaled_path = "$image_path.scaled.$size.png";
+  if (-e $scaled_path) {
+    $image_path = $scaled_path;
+  } else {
+    my $image = Image::Resize->new($image_path);
+    my $gd = $image->resize($size, $size);
+    open(FH, '>', $scaled_path);
+    print FH $gd->jpeg();
+    close(FH);
+    $image_path = $scaled_path;
+  }
+  $fb->blit_write($fb->load_image({
+  'x'          => $x,
+  'y'          => $y,
+  'file'       => $image_path,
+  'convertalpha' => FALSE, 
+  'preserve_transparency' => TRUE
+  }));
   if ($frame_flag) {
     $fb->set_color($white);
     $fb->box({                                # frame around icon
