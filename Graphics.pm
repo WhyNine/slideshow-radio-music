@@ -553,7 +553,7 @@ sub mirror {
 sub scale {
   my $image_ref = shift;
   my $image = $$image_ref;
-  my $scale = min(WIDTH / $$image{"width"}, (HEIGHT - 400) / $$image{"height"});
+  my $scale = (($$image{"width"} > 0) && ($$image{"height"} > 0)) ? min(WIDTH / $$image{"width"}, (HEIGHT - 400) / $$image{"height"}) : 1;
   #print STDERR ("$$image{'width'}:$$image{'height'} scale $scale\n");
   $$image_ref = $fb->blit_transform({
     'blit_data' => $image,

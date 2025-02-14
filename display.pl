@@ -6,7 +6,7 @@ use v5.28;
 use lib "/home/pi/display";
 use Gather;
 use Graphics;
-use UserDetails qw ( $path_to_pictures $health_check_url $radio_stations_ref $jellyfin_url $jellyfin_apikey );
+use UserDetails qw ( $path_to_pictures $health_check_url $radio_stations_ref $jellyfin_url $jellyfin_apikey $display_times_ref );
 use Input;
 use Utils;
 use Http;
@@ -59,10 +59,10 @@ my @swipe_callbacks = (
   {"-up-" => \&display_radio_up, "-down-" => \&display_radio_down}, 
   {"-up-" => \&display_playlists_up, "-down-" => \&display_playlists_down}, 
   {}, 
-  {"-up-" => \&display_albums_by_icon_up, "-down-" => \&display_albums_by_icon_down}, 
+  {"-up-" => \&display_albums_by_icon_up, "-down-" => \&display_albums_by_icon_down, "-left-" => \&display_albums_by_icon_left, "-right-" => \&display_albums_by_icon_right}, 
   {}, 
-  {"-up-" => \&display_artists_by_icon_up, "-down-" => \&display_artists_by_icon_down}, 
-  {"-up-" => \&display_artist_albums_by_icon_up, "-down-" => \&display_artist_albums_by_icon_down},
+  {"-up-" => \&display_artists_by_icon_up, "-down-" => \&display_artists_by_icon_down, "-left-" => \&display_artists_by_icon_left, "-right-" => \&display_artists_by_icon_right}, 
+  {"-up-" => \&display_artist_albums_by_icon_up, "-down-" => \&display_artist_albums_by_icon_down, "-left-" => \&display_artist_albums_by_icon_left, "-right-" => \&display_artist_albums_by_icon_right},
   {});
 
 my %pids;
@@ -582,23 +582,49 @@ sub compile_list_of_albums {
 }
 
 #----------------------------------------------------------------------------------------------------------------------
-# Update the index for the first icon to display
-# Return true if the index has changed
+# Update the input/index for the first icon to display
+# Return true if the input/index has changed
 sub calc_new_index {
-  my ($max, $arg) = @_;
-  my $ref = $displaying_params[$mode_display_area];
-  my $old = $ref->{"index"};
+  my ($ref, $max, $arg) = @_;
+  my $dparms = $displaying_params[$mode_display_area];
+  my $index = $dparms->{"index"};
+  my $input = $dparms->{"input"};
+#  my $max = scalar @{$ref->{$input}};
   if ($arg eq "-up-") {
-    $ref->{"index"} -= 6 if $ref->{"index"} > 0;
+    $dparms->{"index"} -= 6 if $dparms->{"index"} > 0;
+    return ($index != $dparms->{"index"});
   } else {
     if ($arg eq "-down-") {
-      $ref->{"index"} += 6 if $max - 6 >= $ref->{"index"};
+      $dparms->{"index"} += 6 if $max - 6 >= $dparms->{"index"};
+      return ($index != $dparms->{"index"});
     } else {
-      $ref->{"index"} = 0;
-      return 1;
+      if ($arg eq "-left-") {
+        my @letters = sort keys %$ref;
+        foreach my $j (0 .. $#letters - 1) {
+          if ($letters[$j] eq $input) {
+            $dparms->{"input"} = $letters[$j + 1];
+            $dparms->{"index"} = 0;
+            last;
+          }
+        }
+        return ($input ne $dparms->{"input"}); 
+      } else {
+        if ($arg eq "-right-") {
+          my @letters = sort keys %$ref;
+          foreach my $j (1 .. $#letters) {
+            if ($letters[$j] eq $input) {
+              $dparms->{"input"} = $letters[$j - 1];
+              $dparms->{"index"} = 0;
+              last;
+            }
+          }
+          return ($input ne $dparms->{"input"});
+        } else {
+          return 1;
+        }
+      }
     }
   }
-  return ($old != $ref->{"index"});
 }
 
 #----------------------------------------------------------------------------------------------------------------------
@@ -630,12 +656,14 @@ sub display_artists_by_letter {
 
 sub display_artists_by_icon_core {
   my ($input, $arg) = @_;
-  $input = $displaying_params[DISPLAY_ARTISTS_ICON]->{"letter"} unless $input;
-  $displaying_params[DISPLAY_ARTISTS_ICON]->{"letter"} = $input;                 # remember letter we are displaying
-  if (calc_new_index(scalar(keys %{$artists_by_letter{$input}}), $arg)) {
+  $input = $displaying_params[DISPLAY_ARTISTS_ICON]->{"input"} unless $input;
+  $displaying_params[DISPLAY_ARTISTS_ICON]->{"input"} = $input;                 # remember letter we are displaying
+  $displaying_params[DISPLAY_ARTISTS_ICON]->{"index"} = 0 if ! defined $arg;
+  set_display_mode(DISPLAY_ARTISTS_ICON);
+  if (calc_new_index(\%artists_by_letter, scalar keys %{$artists_by_letter{$input}}, $arg)) {
     clear_display_area(0);
-    set_display_mode(DISPLAY_ARTISTS_ICON);
     my %inputs = ();
+    $input = $displaying_params[DISPLAY_ARTISTS_ICON]->{"input"};
     display_artists_with_letter($artists_by_letter{$input}, $displaying_params[DISPLAY_ARTISTS_ICON]->{"index"}, \%inputs);
     foreach my $key (keys %inputs) {
       $inputs{$key}->{"cb"} = \&display_artist_albums_by_icon;
@@ -657,17 +685,26 @@ sub display_artists_by_icon_down {
   display_artists_by_icon_core(undef, "-down-");
 }
 
+sub display_artists_by_icon_left {
+  display_artists_by_icon_core(undef, "-left-");
+}
+
+sub display_artists_by_icon_right {
+  display_artists_by_icon_core(undef, "-right-");
+}
+
 sub display_artist_albums_by_icon_core {
   my ($input, $arg) = @_;
-  #print_error("display albums for artist $input");
   $input = $displaying_params[DISPLAY_ARTISTS_ALBUM]->{"input"} unless $input;
-  $displaying_params[DISPLAY_ARTISTS_ALBUM]->{"input"} = $input;                 # remember letter we are displaying
-  my $ref = $artists_by_letter{$displaying_params[DISPLAY_ARTISTS_ICON]->{"letter"}}->{$input};
-  if (calc_new_index(scalar(keys %{$ref->{"albums"}}), $arg)) {
+  $displaying_params[DISPLAY_ARTISTS_ALBUM]->{"input"} = $input;                 # remember artist we are displaying
+  $displaying_params[DISPLAY_ARTISTS_ALBUM]->{"index"} = 0 if ! defined $arg;
+  set_display_mode(DISPLAY_ARTISTS_ALBUM);
+  my $ref = $artists_by_letter{$displaying_params[DISPLAY_ARTISTS_ICON]->{"input"}};
+  if (calc_new_index($ref, scalar(keys %{$ref->{$input}->{"albums"}}), $arg)) {
     clear_display_area(0);
-    set_display_mode(DISPLAY_ARTISTS_ALBUM);
     my %inputs = ();
-    display_artist_albums_with_letter($ref, $displaying_params[DISPLAY_ARTISTS_ALBUM]->{"index"}, \%inputs);
+    $input = $displaying_params[DISPLAY_ARTISTS_ALBUM]->{"input"};
+    display_artist_albums_with_letter($ref->{$input}, $displaying_params[DISPLAY_ARTISTS_ALBUM]->{"index"}, \%inputs);
     foreach my $key (keys %inputs) {
       $inputs{$key}->{"cb"} = \&play_album;
     }
@@ -686,6 +723,14 @@ sub display_artist_albums_by_icon_up {
 
 sub display_artist_albums_by_icon_down {
   display_artist_albums_by_icon_core(undef, "-down-");
+}
+
+sub display_artist_albums_by_icon_left {
+  display_artist_albums_by_icon_core(undef, "-left-");
+}
+
+sub display_artist_albums_by_icon_right {
+  display_artist_albums_by_icon_core(undef, "-right-");
 }
 
 #----------------------------------------------------------------------------------------------------------------------
@@ -710,10 +755,12 @@ sub display_albums_by_icon_core {
   my ($input, $arg) = @_;
   $input = $displaying_params[DISPLAY_ALBUMS_ICON]->{"input"} unless $input;
   $displaying_params[DISPLAY_ALBUMS_ICON]->{"input"} = $input;                 # remember letter we are displaying
-  if (calc_new_index(scalar @{$albums_by_letter{$input}}, $arg)) {
-  clear_display_area(0);
+  $displaying_params[DISPLAY_ALBUMS_ICON]->{"index"} = 0 if ! defined $arg;
   set_display_mode(DISPLAY_ALBUMS_ICON);
-  my %inputs = ();
+  if (calc_new_index(\%albums_by_letter, scalar @{$albums_by_letter{$input}}, $arg)) {
+    clear_display_area(0);
+    my %inputs = ();
+    $input = $displaying_params[DISPLAY_ALBUMS_ICON]->{"input"};
     display_albums_with_letter($albums_by_letter{$input}, $displaying_params[DISPLAY_ALBUMS_ICON]->{"index"}, \%inputs);
     foreach my $key (keys %inputs) {
       $inputs{$key}->{"cb"} = \&play_album;
@@ -733,6 +780,14 @@ sub display_albums_by_icon_up {
 
 sub display_albums_by_icon_down {
   display_albums_by_icon_core(undef, "-down-");
+}
+
+sub display_albums_by_icon_left {
+  display_albums_by_icon_core(undef, "-left-");
+}
+
+sub display_albums_by_icon_right {
+  display_albums_by_icon_core(undef, "-right-");
 }
 
 sub play_album {
@@ -1091,14 +1146,14 @@ $music_event = Event->timer(after => 0, interval => 60 * 2, cb => sub {
   gather_music(); 
 });
 
-$backlight_event = Event->timer(after => 60, interval => 60 * 10, cb => sub {       # turn display off at 11pm and on at 8am
+$backlight_event = Event->timer(after => 60, interval => 60 * 10, cb => sub {       # turn display on/off depending on yaml schedule
   my $hour = (localtime())[2];
   #print_error("backlight event at $hour");
-  if ($hour == 23) {
+  if ($hour == $$display_times_ref{"off-time"}) {
     turn_display_off();
     $backlight_event->interval(3600) if $backlight_event->interval < 3600;
   }
-  if ($hour == 8) {
+  if ($hour == $$display_times_ref{"on-time"}) {
     turn_display_on();
     $backlight_event->interval(3600) if $backlight_event->interval < 3600;
   }

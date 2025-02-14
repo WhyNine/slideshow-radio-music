@@ -1,6 +1,6 @@
 package UserDetails;
 
-our @EXPORT = qw ( $path_to_pictures $health_check_url $radio_stations_ref $jellyfin_url $jellyfin_apikey $mqtt_ref);
+our @EXPORT = qw ( $path_to_pictures $health_check_url $radio_stations_ref $jellyfin_url $jellyfin_apikey $mqtt_ref $display_times_ref);
 use base qw(Exporter);
 use strict;
 
@@ -31,5 +31,8 @@ print_error("No radio stations defined") unless $radio_stations_ref;
 
 our $mqtt_ref = $settings{"mqtt"};
 print_error("No MQTT server defined") unless $mqtt_ref;
+
+our $display_times_ref = $settings{"display"};
+print_error("No display times defined") unless $display_times_ref;
 
 1;

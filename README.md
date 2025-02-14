@@ -3,7 +3,7 @@ Display photo slideshow or play music from internet radio or Jellyfin server. Th
 
 The default behaviour is to present a slideshow of pictures scraped from a mounted drive.
 
-Buttons along the bottom allow access to internet radio, music from a Jellyfin server and some home parameters from a MQTT server. Paging is accomplished via swiping up/down.
+Buttons along the bottom allow access to internet radio, music from a Jellyfin server and some home parameters from a MQTT server. Paging is accomplished via swiping up/down/left/right.
 * List of radio stations.
 * List of playlists.
 * List of albums, initially by the first letter then all albums starting with that letter.
@@ -29,4 +29,8 @@ stations:                                   (repeat following lines for each sta
     url: "https://xxxxxxxxx"
     icon: "xxxxx.png"
     thumbnail: "xxxxxx.png"
+
+display:
+  on-time: 8
+  off-time: 23
 ```
