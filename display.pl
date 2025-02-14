@@ -589,7 +589,6 @@ sub calc_new_index {
   my $dparms = $displaying_params[$mode_display_area];
   my $index = $dparms->{"index"};
   my $input = $dparms->{"input"};
-#  my $max = scalar @{$ref->{$input}};
   if ($arg eq "-up-") {
     $dparms->{"index"} -= 6 if $dparms->{"index"} > 0;
     return ($index != $dparms->{"index"});
