@@ -791,6 +791,7 @@ sub display_albums_by_icon_right {
 
 sub play_album {
   my ($input) = @_;
+  stop_all_audio();
   print_error("play $input");
   # need to look through albums_by_letter to find match with $input
   my $album_ref;
@@ -849,6 +850,7 @@ sub update_album_playing {
 }
 
 sub album_prev_track {
+  stop_all_audio();
   my $current = $playing_params[PLAYING_ALBUM]->{"track"};
   delete $playing_params[PLAYING_ALBUM]->{"track"};
   #print_error("current track = $current");
@@ -865,6 +867,7 @@ sub album_prev_track {
 }
 
 sub album_next_track {
+  stop_all_audio();
   $playing_params[PLAYING_ALBUM]->{"paused"} = 0;
   my $current = $playing_params[PLAYING_ALBUM]->{"track"};
   delete $playing_params[PLAYING_ALBUM]->{"track"};
@@ -920,6 +923,7 @@ sub update_playlist_playing {
 
 sub play_playlist {
   my ($input) = @_;
+  stop_all_audio();
   print_error("play playlist $input " . $playlists{$input}->{"name"});
   $playing_params[PLAYING_PLAYLIST]->{"playlist"} = $input;
   my $tracks_ref = $playlists{$input}->{"tracks"};
@@ -936,6 +940,7 @@ sub play_playlist {
 }
 
 sub playlist_next_track {
+  stop_all_audio();
   my $title = $playing_params[PLAYING_PLAYLIST]->{"playlist"};
   my $track_ref = $playlists{$title}->{"tracks"};
   my $track_no = $playing_params[PLAYING_PLAYLIST]->{"track"};
@@ -984,6 +989,7 @@ sub update_radio_playing {
 
 sub play_radio {
   my ($input) = @_;
+  stop_all_audio();
   print_error("play radio $input");
   snd($pids{"audio"}, "play", $radio_stations_ref->{$input}->{"url"});
   set_play_mode(PLAYING_RADIO);
