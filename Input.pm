@@ -98,7 +98,7 @@ sub input_task {
   my $touch_down = 0;
   my $press_x = 0;
   my $press_y = 0;
-  $js1 = Linux::Input->new('/dev/input/by-path/platform-3f205000.i2c-event') if (!defined $js1);
+  $js1 = Linux::Input->new('/dev/input/by-path/platform-fe205000.i2c-event') if (!defined $js1);      # May need to change the path if move to new Pi
   while (1) {                                                   # start input loop
     while (my @events = $js1->poll(0.01)) {
       foreach my $ev (@events) {

@@ -140,6 +140,7 @@ sub display_string {
       'size'      => 50,
       'color'     => convert_colour_to_hex($screen_text_colour),
       'face'      => 'Commissioner-Regular.ttf',
+      'font_path'    => "/home/pi/.fonts",
       'justify'   => 'center',
       'line_spacing' => 0,
   });
@@ -205,10 +206,10 @@ sub print_footer {
 }
 
 sub init_fb {
-  $fb = Graphics::Framebuffer->new('SPLASH' => 0, 'FB_DEVICE' => "/dev/fb0", 'IGNORE_X_WINDOWS' => TRUE, 'FONT_PATH' => "/home/pi/.fonts/");
+  $fb = Graphics::Framebuffer->new('SPLASH' => 0, 'FB_DEVICE' => "/dev/fb0", 'IGNORE_X_WINDOWS' => TRUE);         # Note that FONT_FACE seems to be ignored??
   my ($width,$height) = $fb->screen_dimensions();
   if (($width != WIDTH) || ($height != HEIGHT)) {
-    print_error("ERROR /dev/fb0 screen width/height: $width $height", "Display");
+    print_error("ERROR /dev/fb0 screen width/height: $width $height");
   }
   $fb->graphics_mode();
   clear_screen();
@@ -456,6 +457,7 @@ sub print_heading {
     'height'       => 50,
     'wscale'       => 1,                            # Scales the width.  1 is normal
     'face'         => 'Commissioner-Regular.ttf',
+    'font_path'    => "/home/pi/.fonts",
     'color'        => convert_colour_to_hex($screen_text_colour),
     'text'         => $heading,
     'center'       => CENTER_X
@@ -491,6 +493,7 @@ sub display_playing_text {
     'height'    => 38,
     'center'    => CENTER_X,
     'face'      => 'Commissioner-Regular.ttf',
+    'font_path'    => "/home/pi/.fonts",
     'color'     => convert_colour_to_hex($screen_text_colour),
   }));
   my $tmp;
@@ -504,6 +507,7 @@ sub display_playing_text {
       'height'    => $h,
       'center'    => CENTER_X,
       'face'      => 'Commissioner-Regular.ttf',
+      'font_path'    => "/home/pi/.fonts",
       'color'     => convert_colour_to_hex($screen_text_colour),
     });
     last if ($tmp->{"pwidth"} <= $width - 20);
@@ -526,6 +530,7 @@ sub display_playing_nothing {
     'height'    => 38,
     'center'    => CENTER_X,
     'face'      => 'Commissioner-Regular.ttf',
+    'font_path'    => "/home/pi/.fonts",
     'color'     => convert_colour_to_hex($screen_text_colour),
   })) if $full;
 }
@@ -622,6 +627,7 @@ sub display_photo {
       'height'       => 20,
       'wscale'       => 1,                            # Scales the width.  1 is normal
       'face'         => 'Commissioner-Regular.ttf',
+      'font_path'    => "/home/pi/.fonts",
       'color'        => convert_colour_to_hex($screen_text_colour),
       'text'         => "Folder: $folder,  File: $file",
       'center'       => CENTER_X
@@ -682,6 +688,7 @@ sub display_boxed_letter {
     'y'         => $y + 70,
     'height'    => $h - 8,
     'face'      => 'Commissioner-Bold.ttf',
+    'font_path'    => "/home/pi/.fonts",
     'color'     => convert_colour_to_hex($letter_text_colour),
     'center'    => CENTER_X
   }));
@@ -749,6 +756,7 @@ sub display_album_with_title {
     'color'     => convert_colour_to_hex($screen_text_colour), 
     'justify'   => 'center', 
     'face'      => 'Commissioner-Regular.ttf',
+    'font_path'    => "/home/pi/.fonts",
   });
   $fb->clip_set({
     'x'  => $sx + 5,
@@ -764,6 +772,7 @@ sub display_album_with_title {
     'color'     => convert_colour_to_hex($yellow), 
     'justify'   => 'center', 
     'face'      => 'Commissioner-Regular.ttf',
+    'font_path'    => "/home/pi/.fonts",
   });
   $fb->clip_reset();
 }
@@ -840,6 +849,7 @@ sub display_artist_with_title {
     'color'     => convert_colour_to_hex($screen_text_colour), 
     'justify'   => 'center', 
     'face'      => 'Commissioner-Regular.ttf',
+    'font_path'    => "/home/pi/.fonts",
   });
   $fb->clip_reset();
 }
@@ -913,6 +923,7 @@ sub display_playlist_item {
     'color'     => convert_colour_to_hex($screen_text_colour), 
     'justify'   => 'center', 
     'face'      => 'Commissioner-Regular.ttf',
+    'font_path'    => "/home/pi/.fonts",
   });
   $fb->clip_reset();
 }
@@ -997,6 +1008,7 @@ sub display_play_screen_core {
     'color'     => convert_colour_to_hex($screen_text_colour), 
     'justify'   => 'left', 
     'face'      => 'Commissioner-Bold.ttf',
+    'font_path'    => "/home/pi/.fonts",
   });
   my $r = find_last_row($fb->blit_read({
     'x'      => 340,
@@ -1031,6 +1043,7 @@ sub display_play_screen_core {
     'color'     => convert_colour_to_hex($yellow), 
     'justify'   => 'left', 
     'face'      => 'Commissioner-Regular.ttf',
+    'font_path'    => "/home/pi/.fonts",
   });
 }
 
@@ -1055,6 +1068,7 @@ sub display_radio_item {
     'color'     => convert_colour_to_hex($screen_text_colour), 
     'justify'   => 'center', 
     'face'      => 'Commissioner-Regular.ttf',
+    'font_path'    => "/home/pi/.fonts",
   });
   $fb->clip_reset();
 }
@@ -1178,6 +1192,7 @@ sub draw_slice {
     'height'       => ($large) ? 30 : 20,
     'wscale'       => 1.1,                            # Scales the width.  1 is normal
     'face'         => 'Commissioner-SemiBold.ttf',
+    'font_path'    => "/home/pi/.fonts",
     'color'        => convert_colour_to_hex($screen_text_colour),
     'text'         => $title,
     'center'       => CENTER_X
@@ -1195,6 +1210,7 @@ sub draw_slice {
       'height'       => 35,
       'wscale'       => 1,                            # Scales the width.  1 is normal
       'face'         => 'Commissioner-Bold.ttf',
+      'font_path'    => "/home/pi/.fonts",
       'color'        => convert_colour_to_hex($screen_text_colour),
       'text'         => sprintf("%.0f%", $part),
       'center'       => CENTER_X
@@ -1213,6 +1229,7 @@ sub display_ha_param {
     'height'       => 35,
     'wscale'       => 1,                            # Scales the width.  1 is normal
     'face'         => 'Commissioner-Regular.ttf',
+    'font_path'    => "/home/pi/.fonts",
     'color'        => convert_colour_to_hex($screen_text_colour),
     'text'         => "$text1:",
   }));
@@ -1223,6 +1240,7 @@ sub display_ha_param {
     'height'       => 35,
     'wscale'       => 1,                            # Scales the width.  1 is normal
     'face'         => 'Commissioner-Regular.ttf',
+    'font_path'    => "/home/pi/.fonts",
     'color'        => convert_colour_to_hex($screen_text_colour),
     'text'         => $text2,
   }));
@@ -1244,6 +1262,7 @@ sub display_ha_title {
     'height'       => 50,
     'wscale'       => 1,                            # Scales the width.  1 is normal
     'face'         => 'Commissioner-Bold.ttf',
+    'font_path'    => "/home/pi/.fonts",
     'color'        => convert_colour_to_hex($screen_text_colour),
     'text'         => $title,
     'center'       => CENTER_X
