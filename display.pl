@@ -112,10 +112,10 @@ $SIG{'QUIT'} = $SIG{'HUP'} = $SIG{'INT'} = $SIG{'KILL'} = $SIG{'TERM'} = sub { e
 sub set_display_mode {
   my $new = shift;
   return if $new == $mode_display_area;
-  print_error("Setting new display mode");
+  print_error("Setting new display mode $new");
   $mode_display_area = $new;
-  $playing_params[$mode_playing_area]->{"update_fn"}();
   print_heading($display_mode_headings[$mode_display_area]);
+  $playing_params[$mode_playing_area]->{"update_fn"}();
   stop_displaying_pictures() if $mode_display_area != DISPLAY_SLIDESHOW;
   start_displaying_pictures() if $mode_display_area == DISPLAY_SLIDESHOW;
 }

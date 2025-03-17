@@ -1346,6 +1346,7 @@ sub display_car {
   my $valr = $data_ref->{return_car_range()};
   my $valct = $data_ref->{return_car_time()};
   my $valpi = $data_ref->{return_car_connected()};
+  print_error("range=$valr, time=$valct, plug=$valpi");
   if (changed(\@old_values, $valr, $valct, $valpi) || $force_display) {
     $fb->clip_reset();
     $fb->set_color($black);
@@ -1361,8 +1362,8 @@ sub display_car {
     draw_slice($data_ref->{return_car_battery()}, 120, 510, "large", "Battery");
     display_ha_title(420, "Car");
     $valr = int($valr * 5 / 8) . " miles" if defined $valr;
-    $valct = sprintf("%.1f hours") if defined $valct;
-    $valpi = ($valpi eq "off") ? "No" : "Yes" if defined $valpi;
+    $valct = sprintf("%.1f hours", $valct / 60) if defined $valct;
+    $valpi = (($valpi eq "off") ? "No" : "Yes") if defined $valpi;
     display_ha_param(280, 430, "Range", $valr);
     display_ha_param(280, 485, "Charge time", $valct);
     display_ha_param(280, 540, "Plugged in", $valpi);
